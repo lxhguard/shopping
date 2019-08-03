@@ -1,0 +1,194 @@
+
+
+1.react实现的tab切换组件:
+实现思路：
+在使用<TabsControl/>组件时会传入任意数量的div，即为切换组件的主要内容帧，
+在组件内部通过 this.props.children 获取到主要内容帧，并且动态生成相应数量的tab_title，
+再对标题区和内容区设置合适的className，以控制标题区的颜色切换和内容区域的显示和隐藏，
+组件通过 state 存放 index 来记忆被点击的区域，并且每一个标题区域都有绑定一个 click 处理方法，
+每一次点击都会更新 state 的 index 值，组件会自动调用 this.render 方法重新渲染视图，
+上面说到的 className 的设置规则也是借由index值来实现的 
+=> 当标题区域或者内容区域其对应的索引值与 state 中的 index 相同的时候，
+2.在mac下启动mongodb,安装数据库到相应服务端目录下:
+mongod --dbpath=/Users/wanggonggege/Desktop/react/onlinetest/server/db --port=27777
+3.react安装AXIOS:
+npm install axios --save-dev·
+4.react使用axios,并且使用代理:
+多个接口的话
+    src目录下新建一个setupProxy.js,内容如下：
+    //配置跨域:sudo cnpm install http-proxy-middleware
+    const proxy = require("http-proxy-middleware");
+    module.exports = function(app) {
+    app.use(proxy("/api", { 
+        target: "http://localhost:3883",
+        secure: false,
+        changeOrigin: true,
+        pathRewrite: {
+            "^/api": "/"
+        },
+        // cookieDomainRewrite: "http://localhost:3000"
+        }));
+    };
+    
+    
+    如果你只有一个接口，可以修改package.json文件，增加如下：
+    "proxy": "http://localhost:3883"
+
+把axios添加到原型链上(配置src/index.js):
+import axios from "axios";
+React.Component.prototype.axios = axios;
+组件中调用就直接使用 this.axios 就好了.
+5.react提交表单数据：
+    事件绑定在form上，同时在form上：event.preventDefault(); 来阻止表单默认事件的发生。
+    在表单绑定的事件中，获得对应imput元素中的值，
+6.发送邮件的时候有错误：{ Error: No recipients defined未定义收件人
+7.react项目中页面跳转、刷新及获取网络状态：（window指代的是当前页面）
+// 页面跳转
+window.location.href = 'http://test.lxh.com/'
+// 页面刷新
+window.location.reload()
+// 获取当前网络状态，只能判断用户电脑有没有断网（包括无线和有线），有网为true，没有网为false
+navigator.onLine
+8.react input 设置默认值
+(1)、text类型
+<input type="text" value={默认值} />  ,这种写法可以显示默认值，但不能对输入框进行编辑
+正确写法: <input type="text" defaultValue={默认值} /> 
+(2)、checkbox类型
+<input type="checkbox" checked />默认勾选，不能更改状态
+正确写法: <input type="checkbox" defaultChecked={true} />
+9.安装UI样式：(Ant Design of React)
+npm install antd --save
+修改 src/App.css，在文件顶部引入 antd/dist/antd.css。
+@import '~antd/dist/antd.css';
+这样子就能用了。
+10.react中使用bootstrap样式:
+sudo cnpm install bootstrap --save-dev
+在src目录下的index.js中全局引入bootstrap：
+import 'bootstrap/dist/css/bootstrap.min.css'
+11.切换背景主题：
+Context是什么?
+    Props属性是由上到下单向传递的
+    Context提供了在组件中共享此类值的方法
+Context使用：
+    设计目的是共享那些对于组件来说<全局的数据>
+    不要仅仅为了避免在几个层级下的组件传递props而使用context
+    注意：context不要放在components中，在src下新建一个 context 对象。
+12.(未解决)在react中使用sass:
+cnpm install sass-loader node-sass --save-dev
+13.react路由跳转，跳转到对应商铺：
+在<BrowserRouter>里面设置<Route></Route>到对应位置，<Link>则在需要的文件里面写。
+在这个项目中，代码对应src/components/NavBar + Shops.
+传递参数：<Link to={"/OneShop/" + _id} >
+接收参数：this.props.match.params.id
+14.在OneShop中，推荐菜会被先渲染undefined，再componentDidMount得到数据,再次render更新数据。
+这个感觉有点不是理解的很明白，但是感觉和生命周期有关，重新setState会触发重新渲染。
+组件生命周期的执行次数是什么样子的？？？
+    只执行一次： constructor、componentWillMount、componentDidMount
+    执行多次：render 、子组件的componentWillReceiveProps、componentWillUpdate、componentDidUpdate
+    有条件的执行：componentWillUnmount（页面离开，组件销毁时）
+    不执行的：根组件（ReactDOM.render在DOM上的组件）的componentWillReceiveProps（因为压根没有父组件给传递props）
+15.父组件向子组件中传递props,如果父组件中props改变，对应更新子组件中接收的props，
+应该在子组件的生命周期componentWillReceiveProps(nextProps)中进行更新.
+16.获得input的用户输入：
+方法一：给input 绑定value到state上，同时设置事件监听函数，更新用户输入的值
+//监听input输入框的变化
+    handleInputChange(e) {
+        this.setState({
+            inputValue: e.target.value
+        });
+    }
+项目示例：输入并获得 美食订单地址。
+解析：这种方式比较简单。
+方法二：ref属性，表示为对组件真正实例的引用
+react在销毁组件或者重新渲染的时候，清空ref引用里面的东西，防止内存泄漏。
+可以通过_inputElement属性访问input的dom对象
+            <form onSubmit={this.addItem}>
+            <input
+              ref={a => (this._inputElement = a)}
+              type="text"
+              placeholder="请输入一个任务"
+            />
+            <button type="submit">添加</button>
+          </form>
+通过 this._inputElement.value, //得到文本框里面的内容
+项目示例：在编辑个人信息的时候
+解析：这种方式得在form中，并且把事件绑定在form上。button触发后，会触发form的onSubmit事件监听。
+17.子组件改变父组件中的state（父组件作为props传递给子组件的state）:
+解决方法：子组件如果想和父组件通信，子组件要调用父组件传递过来的方法.
+本项目中的示例：购物车成功下单，应该选择清空购物车。购物车中的foodlist是通过父组件的props初始化的。
+18.(深坑！已解决)react 自动执行绑定的onClick事件。
+之前的做法：在constructor中绑定this,但是在onClick中传递参数。
+解决办法：在onClick中 bind(this,传递参数)，这样子不会自动执行了。
+数组知识点：forEach进行循环, .splice(index, 1)在原数组上进行删除
+19.node踩坑了。获取订单信息一直为空，发现存储订单信息的时候没有存储关联信息！！！
+20.react的html中函数绘制节点，应该先判断是否存在，才可以渲染。
+如果是变量.map(),则使用三目运算符判断。前面是个常量数组则正常使用。
+项目中代码如下：
+//渲染评论
+    renderComment(){
+        const shop = this.state.shop;
+        return (
+            <div>
+                {
+                    shop.comments !== undefined ?
+                    (shop.comments.map((item,index)=>{
+                        return (
+                            <div className="item__content" key={index}>
+                                <div>
+                                    <img src={item.info.avatarurl} width="100" height="100"/>
+                                    <div>{item.info.nickname}</div>
+                                    <div>{item.date}</div>
+                                </div>
+                                <div>
+                                    {item.comment}
+                                </div>
+                            </div>
+                        )
+                    })):
+                    ""
+                }
+            </div>
+        )
+    }
+注意点：绘制dom节点的函数，不需要绑定this，但是写的时候需要带上(),如{this.renderComment()}
+需要绑定this的函数，如点击事件触发函数，在写的时候则不用带上()，onClick={this.handleFood}
+21.create-react-app全家桶状态管理之redux:
+sudo cnpm install redux react-redux --save
+22.下面的代码是放在constructor中的:
+/**
+ * 页面上的内容并没有随着store的更新而更新，所以如下操作:
+ * store发生改变，则subscribe()绑定的函数会自动执行
+*/
+store.subscribe(this.handleStoreChange);
+为什么subscribe必须放在dispatch的前面，不然就无法监听store的变化？
+这两个调用都是同步的按顺序执行。subscribe先监听了，才能获得后面dispatch带来的store的变化。
+22.优化：新建一个actionType文件，把常量放里面：
+因为如果常量如CHANGE_INPUT_VALUE拼写错误了，页面会报错，有报错信息。
+但是如果使用字符串，则不会提示信息，页面只会无法显示效果，可以正常打开页面。
+这就是为什么要拆分actionType的原因。
+23.redux入门看ToDoList文件夹
+redux进阶看ToDoListUp文件夹。
+24.关于redux进阶：
+UI组件和容器组件的拆分：渲染和逻辑都放在一个组件中管理，组件维护起来比较困难。
+    UI组件负责页面的渲染，逻辑组件负责页面的逻辑
+*子组件调用赋组件传递的方法，并且传递数值，应该：                  
+onClick={(index) => {this.props.handleItemDelete(index)}}
+不可以使用.bind传递参数，会报错.
+25.使用redux-thunk:
+安装：npm install redux-thunk
+使用：
+import { createStore, applyMiddleware } from 'redux';
+import thunk from 'redux-thunk';
+26.使用redux-saga:
+安装：$ npm install --save redux-saga
+27.使用react-redux:
+安装：npm install --save react-redux
+28.打包：
+npm run build
+会出来一个build文件夹，即打包结果
+29.
+
+
+
+
+
